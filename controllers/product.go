@@ -63,7 +63,7 @@ func UpdateProduct(c *gin.Context) {
 	if userRole != enums.Admin {
 		product.UserID = userID
 	}
-	
+
 	product.ID = uint(productId)
 
 	err := db.Model(&product).Where("id = ?", uint(productId)).Updates(models.Product{
@@ -121,17 +121,33 @@ func GetProduct(c *gin.Context) {
 
 func GetAllProduct(c *gin.Context) {
 	db := database.GetDB()
+	userData := c.MustGet("userData").(jwt.MapClaims)
+
+	userID := uint(userData["id"].(float64))
+	userRole := userData["role"].(string)
 
 	product := []models.Product{}
 
-	err := db.Find(&product).Error
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "bad request",
-			"message": err.Error(),
-		})
+	if userRole != enums.Admin {
+		err := db.Where("user_id = ?", userID).Find(&product).Error
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"err":     "bad request",
+				"message": err.Error(),
+			})
 
-		return
+			return
+		}
+	} else {
+		err := db.Find(&product).Error
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"err":     "bad request",
+				"message": err.Error(),
+			})
+
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, product)

@@ -14,7 +14,7 @@ import (
 var (
 	host     = "localhost"
 	user     = "postgres"
-	password = "ifj173gz42"
+	password = ""
 	port     = "5432"
 	dbname   = "db_go_sql"
 	db       *gorm.DB

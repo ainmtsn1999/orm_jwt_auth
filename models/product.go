@@ -9,7 +9,7 @@ type Product struct {
 	GormModel
 	Title       string `json:"title" form:"title" valid:"required~Your title is required"`
 	Description string `json:"description" form:"description" valid:"required~Your description is required"`
-	UserID      uint
+	UserID      uint   `json:"user_id"`
 	User        *User
 }
 

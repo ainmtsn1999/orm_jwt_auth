@@ -46,7 +46,7 @@ func ProductAuth() gin.HandlerFunc {
 
 		userData := c.MustGet("userData").(jwt.MapClaims)
 		userID := uint(userData["id"].(float64))
-		userRole := userData["role"].(string)
+		//userRole := userData["role"].(string)
 		product := models.Product{}
 
 		err = db.Select("user_id").First(&product, uint(productId)).Error
@@ -59,7 +59,7 @@ func ProductAuth() gin.HandlerFunc {
 			return
 		}
 
-		if product.UserID != userID || userRole != enums.Admin {
+		if product.UserID != userID {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error":   "unauthorized",
 				"message": "you're not allowed to access this endpoint {productAuth}",
