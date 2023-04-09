@@ -69,11 +69,11 @@ func UpdateProduct(c *gin.Context) {
 	err := db.Model(&product).Where("id = ?", uint(productId)).Updates(models.Product{
 		Title:       product.Title,
 		Description: product.Description,
-	}).Error
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"err":     "bad request",
-			"message": err.Error(),
+	}).RowsAffected
+	if err == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"err":     "not found",
+			"message": "invalid id or not found",
 		})
 
 		return

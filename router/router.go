@@ -23,7 +23,7 @@ func StartApp() *gin.Engine {
 		productRouter.GET("/:productId", middlewares.ProductAuth(), controllers.GetProduct)
 		productRouter.POST("/", controllers.CreateProduct)
 		productRouter.PUT("/:productId", controllers.UpdateProduct)
-		productRouter.DELETE("/:productId", controllers.UpdateProduct)
+		productRouter.DELETE("/:productId", controllers.DeleteProduct)
 
 	}
 
