@@ -66,22 +66,22 @@ func UpdateProduct(c *gin.Context) {
 
 	product.ID = uint(productId)
 
-	err := db.Model(&product).Where("id = ?", uint(productId)).Updates(models.Product{
+	query := db.Model(&product).Where("id = ?", uint(productId)).Updates(models.Product{
 		Title:       product.Title,
 		Description: product.Description,
-	}).Error
-	if err != nil {
-		if err.Error() == "record not found" {
+	})
+	if query.Error != nil || query.RowsAffected == 0 {
+		if query.RowsAffected == 0 {
 			c.JSON(http.StatusNotFound, gin.H{
 				"err":     "not found",
 				"message": "invalid id or not found",
 			})
 			return
 		}
-		
+
 		c.JSON(http.StatusBadRequest, gin.H{
 			"err":     "bad request",
-			"message": err.Error(),
+			"message": query.Error.Error(),
 		})
 		return
 	}
