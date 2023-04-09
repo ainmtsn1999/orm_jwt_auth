@@ -69,13 +69,20 @@ func UpdateProduct(c *gin.Context) {
 	err := db.Model(&product).Where("id = ?", uint(productId)).Updates(models.Product{
 		Title:       product.Title,
 		Description: product.Description,
-	}).RowsAffected
-	if err == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"err":     "not found",
-			"message": "invalid id or not found",
+	}).Error
+	if err != nil {
+		if err.Error() == "record not found" {
+			c.JSON(http.StatusNotFound, gin.H{
+				"err":     "not found",
+				"message": "invalid id or not found",
+			})
+			return
+		}
+		
+		c.JSON(http.StatusBadRequest, gin.H{
+			"err":     "bad request",
+			"message": err.Error(),
 		})
-
 		return
 	}
 
@@ -108,6 +115,14 @@ func GetProduct(c *gin.Context) {
 
 	err := db.First(&product, productId).Error
 	if err != nil {
+		if err.Error() == "record not found" {
+			c.JSON(http.StatusNotFound, gin.H{
+				"err":     "not found",
+				"message": "invalid id or not found",
+			})
+			return
+		}
+
 		c.JSON(http.StatusBadRequest, gin.H{
 			"err":     "bad request",
 			"message": err.Error(),
@@ -131,6 +146,14 @@ func GetAllProduct(c *gin.Context) {
 	if userRole != enums.Admin {
 		err := db.Where("user_id = ?", userID).Find(&product).Error
 		if err != nil {
+			if err.Error() == "record not found" {
+				c.JSON(http.StatusNotFound, gin.H{
+					"err":     "not found",
+					"message": "invalid id or not found",
+				})
+				return
+			}
+
 			c.JSON(http.StatusBadRequest, gin.H{
 				"err":     "bad request",
 				"message": err.Error(),
@@ -141,6 +164,13 @@ func GetAllProduct(c *gin.Context) {
 	} else {
 		err := db.Find(&product).Error
 		if err != nil {
+			if err.Error() == "record not found" {
+				c.JSON(http.StatusNotFound, gin.H{
+					"err":     "not found",
+					"message": "invalid id or not found",
+				})
+				return
+			}
 			c.JSON(http.StatusBadRequest, gin.H{
 				"err":     "bad request",
 				"message": err.Error(),
